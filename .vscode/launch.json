@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:voicenotes}",
+            "name": "Debug VoiceNotesApp",
+            "program": "${workspaceFolder:voicenotes}/.build/debug/VoiceNotesApp",
+            "preLaunchTask": "swift: Build Debug VoiceNotesApp"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:voicenotes}",
+            "name": "Release VoiceNotesApp",
+            "program": "${workspaceFolder:voicenotes}/.build/release/VoiceNotesApp",
+            "preLaunchTask": "swift: Build Release VoiceNotesApp"
+        }
+    ]
+}

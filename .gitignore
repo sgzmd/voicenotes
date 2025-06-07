@@ -1,0 +1,20 @@
+# Build output
+Build/
+
+# macOS system files
+.DS_Store
+
+# Xcode project user data
+*.xcuserstate
+*.xcuserdata
+*.xcworkspace/xcuserdata
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# Logs
+*.log
+
+# Derived data (if ever opened in Xcode)
+DerivedData/
