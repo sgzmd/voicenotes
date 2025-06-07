@@ -56,7 +56,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc func quitApp() {
+    @MainActor @objc func quitApp() {
         NSApp.terminate(nil)
     }
 }
