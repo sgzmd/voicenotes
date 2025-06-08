@@ -16,5 +16,7 @@
   <true/>
   <key>NSMicrophoneUsageDescription</key>
   <string>This app records audio notes</string>
+  <key>NSInputMonitoringUsageDescription</key>
+  <string>This app uses global hotkeys to record voice notes.</string>
 </dict>
 </plist>
