@@ -1,5 +1,5 @@
 APP_NAME = VoiceNotesApp
-SRC = Sources/main.swift Sources/AppDelegate.swift
+SRC = Sources/main.swift Sources/AppDelegate.swift Sources/PromptWindowController.swift
 ICON = Assets/Microphone.png
 PLIST = Plist/Info.plist
 

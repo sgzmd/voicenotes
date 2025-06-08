@@ -7,6 +7,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var isRecording = false
     var eventTap: CFMachPort?
 
+    var promptWindowController: PromptWindowController?
+
+    @MainActor func showSpectrumWindow() {
+        promptWindowController = PromptWindowController()
+    }
+
+    @MainActor func hideSpectrumWindow() {
+        promptWindowController?.close()
+        promptWindowController = nil
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         updateIcon()
@@ -36,6 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if isRecording {
             recorder?.stop()
             isRecording = false
+            hideSpectrumWindow()
         } else {
             let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             let folder = docs.appendingPathComponent("VoiceNotes")
@@ -62,6 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             recorder?.record()
             isRecording = true
+            showSpectrumWindow()
         }
 
         updateIcon()
