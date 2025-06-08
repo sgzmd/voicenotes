@@ -2,7 +2,7 @@
 import Cocoa
 
 
-let bundleID = Bundle.main.bundleIdentifier!
+let bundleID = Bundle.main.bundleIdentifier ?? "com.sgzmd.VoiceNotesApp"
 let runningInstances = 
     NSRunningApplication.runningApplications(withBundleIdentifier: bundleID);
 
