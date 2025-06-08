@@ -6,12 +6,19 @@ import PackageDescription
 let package = Package(
     name: "VoiceNotesApp",
     platforms: [
-        .macOS(.v10_15)
+        .macOS(.v13)
     ],
+    dependencies: [
+        .package(url: "https://github.com/argmaxinc/WhisperKit.git", from: "0.12.0")
+    ],
+
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .executableTarget(
-            name: "VoiceNotesApp"),
+            name: "VoiceNotesApp",
+            dependencies: [
+                .product(name: "WhisperKit", package: "WhisperKit")
+            ])
     ]
 )

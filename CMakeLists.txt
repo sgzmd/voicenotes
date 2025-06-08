@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.22)
 project(VoiceNotesApp LANGUAGES Swift)
 
 set(APP_NAME VoiceNotesApp)
+set(APP_BUNDLE_ID com.sgzmd.voicenotes)
 set(SOURCES
     Sources/main.swift
     Sources/AppDelegate.swift
+    Sources/PromptWindowController.swift
 )
 
 # Output bundle path
@@ -17,7 +19,9 @@ add_executable(${APP_NAME} ${SOURCES})
 
 # Set macOS app properties
 set_target_properties(${APP_NAME} PROPERTIES
+    Swift_LANGUAGE_VERSION "5.0"
     MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_GUI_IDENTIFIER ${APP_BUNDLE_ID}
     MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME}
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/Plist/Info.plist
     RESOURCE "${CMAKE_SOURCE_DIR}/Assets/Microphone.png"

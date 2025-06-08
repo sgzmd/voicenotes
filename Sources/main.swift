@@ -1,6 +1,7 @@
 // Sources/main.swift
 import Cocoa
 
+
 let bundleID = Bundle.main.bundleIdentifier!
 let runningInstances = 
     NSRunningApplication.runningApplications(withBundleIdentifier: bundleID);

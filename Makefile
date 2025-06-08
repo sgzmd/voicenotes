@@ -11,6 +11,13 @@ RESOURCES_DIR = $(APP_BUNDLE)/Contents/Resources
 
 all: $(MACOS_DIR)/$(APP_NAME)
 
+resolve:
+	swift package resolve
+
+build:
+	swift build -c release
+
+
 $(MACOS_DIR)/$(APP_NAME): $(SRC) $(PLIST) $(ICON)
 	@echo "Building app bundle..."
 	mkdir -p $(MACOS_DIR)
