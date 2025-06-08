@@ -8,10 +8,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        if let button = statusItem.button {
-            let iconPath = Bundle.main.path(forResource: "Microphone", ofType: "png")!
-            button.image = NSImage(contentsOfFile: iconPath)
-        }
+        updateIcon()
+
+        statusItem.button?.action = #selector(toggleRecord(_:))
+        statusItem.button?.target = self
 
         let menu = NSMenu()
         menu.addItem(
@@ -20,10 +20,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu = menu
     }
 
-    @objc func toggleRecord(_ sender: NSMenuItem) {
+    @MainActor func updateIcon() {
+        if #available(macOS 11.0, *) {
+            let symbolName = isRecording ? "stop.circle.fill" : "mic.fill"
+            let image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)
+            image?.isTemplate = true
+            statusItem.button?.image = image
+        }
+    }
+
+    @MainActor @objc func toggleRecord(_ sender: NSMenuItem) {
         if isRecording {
             recorder?.stop()
-            sender.title = "Record"
+            sender.title = "Record"            
             isRecording = false
         } else {
             let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -54,6 +63,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             sender.title = "Stop Recording"
             isRecording = true
         }
+
+        updateIcon()
     }
 
     @MainActor @objc func quitApp() {
