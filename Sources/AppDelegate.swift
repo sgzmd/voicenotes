@@ -1,5 +1,6 @@
 import AVFoundation
 import Cocoa
+import WhisperKit
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
@@ -29,7 +30,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(
             NSMenuItem(title: "Record", action: #selector(toggleRecord), keyEquivalent: "r"))
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
-        statusItem.menu = menu               
+        statusItem.menu = menu
 
         startEventTap()
     }
@@ -48,6 +49,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             recorder?.stop()
             isRecording = false
             hideSpectrumWindow()
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {                
+                if let url = self.recorder?.url {
+                    Task {
+                        do {
+                            let whisper = try await WhisperKit(WhisperKitConfig(model: "tiny"))
+                            let result = try await whisper.transcribe(
+                                audioPath: url.path() ?? "")
+                            let fullText = result.flatMap { $0.segments }.map { $0.text }.joined()
+                            NSLog("Transcript: \(fullText)")
+                        } catch {
+                            NSLog("Transcription error: \(error)")
+                        }
+                    }
+                }
+            }
+
         } else {
             let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             let folder = docs.appendingPathComponent("VoiceNotes")

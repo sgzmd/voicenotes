@@ -7,7 +7,8 @@
             "cwd": "${workspaceFolder:voicenotes}",
             "name": "Debug VoiceNotesApp",
             "program": "${workspaceFolder:voicenotes}/.build/debug/VoiceNotesApp",
-            "preLaunchTask": "swift: Build Debug VoiceNotesApp"
+            "preLaunchTask": "swift: Build Debug VoiceNotesApp",
+            
         },
         {
             "type": "swift",
@@ -16,7 +17,7 @@
             "cwd": "${workspaceFolder:voicenotes}",
             "name": "Release VoiceNotesApp",
             "program": "${workspaceFolder:voicenotes}/.build/release/VoiceNotesApp",
-            "preLaunchTask": "swift: Build Release VoiceNotesApp"
+            "preLaunchTask": "swift: Build Release VoiceNotesApp",
         }
     ]
 }
