@@ -87,7 +87,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                 Task { @MainActor in
                     self.recorder?.updateMeters()
-                    NSLog("Average power: \(self.recorder?.averagePower(forChannel: 0) ?? -999)")
                 }
             }
             recorder?.record()
