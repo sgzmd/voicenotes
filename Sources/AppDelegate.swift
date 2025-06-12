@@ -6,7 +6,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     var recorder: AVAudioRecorder?
     var isRecording = false
-    var eventTap: CFMachPort?
+    var globalHotkeyListener: GlobalHotkeyListener? // Added
 
     var promptWindowController: PromptWindowController?
 
@@ -32,7 +32,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
         statusItem.menu = menu
 
-        startEventTap()
+        // Use GlobalHotkeyListener instead of startEventTap
+        globalHotkeyListener = GlobalHotkeyListener { [weak self] in
+            Task { @MainActor in
+                self?.toggleRecordingFromHotkey()
+            }
+        }
     }
 
     @MainActor func updateIcon() {
@@ -101,52 +106,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor func updateMenuTitle() {
         guard let menu = statusItem.menu else { return }
         menu.items.first?.title = isRecording ? "Stop Recording" : "Record"
-    }
-
-    @MainActor func startEventTap() {
-        print("Installing global event tap")
-        let mask = (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue)
-
-        eventTap = CGEvent.tapCreate(
-            tap: .cgSessionEventTap,
-            place: .headInsertEventTap,
-            options: .listenOnly,
-            eventsOfInterest: CGEventMask(mask),
-            callback: { (_, type, event, refcon) -> Unmanaged<CGEvent>? in
-                guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
-                let keycode = event.getIntegerValueField(.keyboardEventKeycode)
-                let flags = event.flags
-
-                print("Key event received. Keycode: \(keycode), flags: \(flags.rawValue)")
-
-                let delegate = Unmanaged<AppDelegate>.fromOpaque(refcon).takeUnretainedValue()
-
-                let isCmdShift = flags.contains(.maskCommand) && flags.contains(.maskShift)
-
-                // F2 key = keycode 120
-                if keycode == 120 && isCmdShift && type == .keyDown {
-                    Task { @MainActor in
-                        delegate.toggleRecordingFromHotkey()
-                    }
-                    // Prevent key event from propagating if you want (optional)
-                    return nil
-                }
-
-                return Unmanaged.passRetained(event)
-            },
-            userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-        )
-
-        guard let eventTap = eventTap else {
-            print("Failed to create event tap.")
-            return
-        }
-
-        let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
-        CFRunLoopAddSource(CFRunLoopGetMain(), runLoopSource, .commonModes)
-        CGEvent.tapEnable(tap: eventTap, enable: true)
-
-        print("Global event tap installed successfully.")
     }
 
     @MainActor func toggleRecordingFromHotkey() {
