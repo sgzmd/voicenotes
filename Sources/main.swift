@@ -1,5 +1,6 @@
 // Sources/main.swift
 import Cocoa
+import TranscriptionService
 
 
 let bundleID = Bundle.main.bundleIdentifier ?? "com.sgzmd.VoiceNotesApp"

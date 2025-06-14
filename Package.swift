@@ -9,7 +9,8 @@ let package = Package(
         .macOS(.v13)
     ],
     dependencies: [
-        .package(url: "https://github.com/argmaxinc/WhisperKit.git", from: "0.12.0")
+        .package(url: "https://github.com/argmaxinc/WhisperKit.git", from: "0.12.0"),
+        .package(path: "./Libraries/TranscriptionService"),
     ],
 
     targets: [
@@ -18,7 +19,8 @@ let package = Package(
         .executableTarget(
             name: "VoiceNotesApp",
             dependencies: [
-                .product(name: "WhisperKit", package: "WhisperKit")
+                .product(name: "WhisperKit", package: "WhisperKit"),
+                .product(name: "TranscriptionService", package: "TranscriptionService"),
             ]
         ),
     ]
