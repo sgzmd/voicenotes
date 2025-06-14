@@ -6,10 +6,11 @@ public class WhisperKitTinyTranscriber: Transcriber {
     public init() {}
 
     public func transcribe(audioPath: String) async throws -> String {
-        let config = WhisperKitConfig(model: "tiny")
+        let config = WhisperKitConfig(model: "openai_whisper-tiny.en")
         let modelPath = Bundle.module.path(
             forResource: "tiny", ofType: nil, inDirectory: "TestModels")!
         config.verbose = true
+        config.modelFolder = modelPath
 
         let whisper = try await WhisperKit(config)
         let result = try await whisper.transcribe(audioPath: audioPath)

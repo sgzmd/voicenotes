@@ -16,6 +16,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install Git LFS
+      run: |
+        brew install git-lfs
+        git lfs install
+
+    - name: Fetch WhisperKit tiny model
+      run: |
+        chmod +x ./fetch_tiny_model.sh
+        ./fetch_tiny_model.sh
+
     - name: Build
       run: swift build
     - name: Test

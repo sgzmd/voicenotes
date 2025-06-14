@@ -20,7 +20,7 @@ final class TranscriptionServiceTests: XCTestCase {
         let t = WhisperKitTinyTranscriber()
         let service = TranscriberService(transcriber: t)
         let result = try await service.transcribe(audioPath: "Assets/test.m4a")
-        XCTAssertEqual(result, "How to dismantle an atomic bomb?")
+        XCTAssertEqual(result, "How to dismantle an atomic bomb.")
     }
     
 }

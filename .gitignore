@@ -17,4 +17,5 @@ Build/
 *.log
 
 # Derived data (if ever opened in Xcode)
-DerivedData/
+DerivedData/TestModels/tiny
+Tests/TranscriptionService/TestModels/tiny
