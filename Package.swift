@@ -32,7 +32,7 @@ let package = Package(
         .testTarget(
             name: "TranscriptionServiceTests",
             dependencies: ["TranscriptionService"],
-            path: "Tests/TranscriptionService",
+            path: "Tests/TranscriptionService"
         )
     ]
 
