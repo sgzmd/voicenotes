@@ -1,4 +1,3 @@
-
 import Foundation
 import WhisperKit
 
@@ -9,7 +8,7 @@ public class TranscriptionService {
         // For more accurate transcription, consider using "base" or other larger models.
         let whisper = try await WhisperKit(WhisperKitConfig(model: "tiny"))
         let result = try await whisper.transcribe(audioPath: audioPath)
-        
+
         // Concatenate all segments to form the full transcription
         let fullText = result.flatMap { $0.segments }.map { $0.text }.joined()
         return fullText

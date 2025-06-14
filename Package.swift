@@ -16,15 +16,24 @@ let package = Package(
         .target(name: "TranscriptionService",
             dependencies: [
                 .product(name: "WhisperKit", package: "WhisperKit"),
-            ],
-            sources: ["TranscriptionService.swift"],
+            ],            
+            path: "Sources/TranscriptionService"
         ),
         .executableTarget(
             name: "VoiceNotesApp",
             dependencies: [
                 "TranscriptionService",
                 .product(name: "WhisperKit", package: "WhisperKit"),
+            ],
+            linkerSettings: [
+                .linkedFramework("CoreAudio")
             ]
         ),
+        .testTarget(
+            name: "TranscriptionServiceTests",
+            dependencies: ["TranscriptionService"],
+            path: "Tests/TranscriptionService",
+        )
     ]
+
 )
