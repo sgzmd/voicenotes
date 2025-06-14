@@ -10,9 +10,17 @@ final class TranscriptionServiceTests: XCTestCase {
         }
     }
 
-    func testTranscriptionConcatenatesSegments() async throws {
+    func testTranscriptionFake() async throws {
         let service = TranscriberService(transcriber: MockTranscriber())
         let result = try await service.transcribe(audioPath: "/dummy/path.wav")
         XCTAssertEqual(result, "Hello world!")
     }
+
+    func testTranscriptionWhisperKit() async throws {
+        let t = WhisperKitTinyTranscriber()
+        let service = TranscriberService(transcriber: t)
+        let result = try await service.transcribe(audioPath: "Assets/test.m4a")
+        XCTAssertEqual(result, "How to dismantle an atomic bomb?")
+    }
+    
 }

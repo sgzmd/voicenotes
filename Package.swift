@@ -9,14 +9,15 @@ let package = Package(
         .macOS(.v13)
     ],
     dependencies: [
-        .package(url: "https://github.com/argmaxinc/WhisperKit.git", from: "0.12.0"),
+        .package(url: "https://github.com/argmaxinc/WhisperKit.git", from: "0.12.0")
     ],
 
     targets: [
-        .target(name: "TranscriptionService",
+        .target(
+            name: "TranscriptionService",
             dependencies: [
-                .product(name: "WhisperKit", package: "WhisperKit"),
-            ],            
+                .product(name: "WhisperKit", package: "WhisperKit")
+            ],
             path: "Sources/TranscriptionService"
         ),
         .executableTarget(
@@ -32,8 +33,12 @@ let package = Package(
         .testTarget(
             name: "TranscriptionServiceTests",
             dependencies: ["TranscriptionService"],
-            path: "Tests/TranscriptionService"
-        )
+
+            path: "Tests/TranscriptionService",
+            resources: [
+                .copy("TestModels")
+            ]
+        ),
     ]
 
 )
