@@ -19,6 +19,7 @@ let package = Package(
             name: "VoiceNotesApp",
             dependencies: [
                 .product(name: "WhisperKit", package: "WhisperKit")
-            ])
+            ]
+        ),
     ]
 )

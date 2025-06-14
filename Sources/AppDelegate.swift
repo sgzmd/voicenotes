@@ -2,10 +2,9 @@ import AVFoundation
 import Cocoa
 import WhisperKit
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, AudioRecorderDelegate {
     var statusItem: NSStatusItem!
-    var recorder: AVAudioRecorder?
-    var isRecording = false
+    var audioRecorder = AudioRecorder()
     var globalHotkeyListener: GlobalHotkeyListener? // Added
 
     var promptWindowController: PromptWindowController?
@@ -20,6 +19,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        audioRecorder.delegate = self
+        
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         updateIcon()
 
@@ -42,7 +43,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor func updateIcon() {
         if #available(macOS 11.0, *) {
-            let symbolName = isRecording ? "stop.circle.fill" : "mic.fill"
+            let symbolName = audioRecorder.isRecording ? "stop.circle.fill" : "mic.fill"
             let image = NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)
             image?.isTemplate = true
             statusItem.button?.image = image
@@ -50,73 +51,59 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @MainActor @objc func toggleRecord(_ sender: Any?) {
-        if isRecording {
-            recorder?.stop()
-            isRecording = false
-            hideSpectrumWindow()
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {                
-                if let url = self.recorder?.url {
-                    Task {
-                        do {
-                            let whisper = try await WhisperKit(WhisperKitConfig(model: "tiny"))
-                            let result = try await whisper.transcribe(
-                                audioPath: url.path() ?? "")
-                            let fullText = result.flatMap { $0.segments }.map { $0.text }.joined()
-                            NSLog("Transcript: \(fullText)")
-                        } catch {
-                            NSLog("Transcription error: \(error)")
-                        }
-                    }
-                }
-            }
-
+        if audioRecorder.isRecording {
+            audioRecorder.stopRecording()
         } else {
-            let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let folder = docs.appendingPathComponent("VoiceNotes")
-            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-
-            let timestamp = Int(Date().timeIntervalSince1970)
-            let fileURL = folder.appendingPathComponent("voice-note-\(timestamp).m4a")
-
-            let settings: [String: Any] = [
-                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-                AVSampleRateKey: 44100,
-                AVNumberOfChannelsKey: 1,
-                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
-            ]
-
-            recorder = try? AVAudioRecorder(url: fileURL, settings: settings)
-            recorder?.prepareToRecord()
-            recorder?.isMeteringEnabled = true
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-                Task { @MainActor in
-                    self.recorder?.updateMeters()
-                }
+            do {
+                try audioRecorder.startRecording()
+            } catch {
+                NSLog("Failed to start recording: \(error)")
             }
-            recorder?.record()
-            isRecording = true
-            showSpectrumWindow()
         }
-
-        updateIcon()
-        updateMenuTitle()
     }
 
     @MainActor func updateMenuTitle() {
         guard let menu = statusItem.menu else { return }
-        menu.items.first?.title = isRecording ? "Stop Recording" : "Record"
+        menu.items.first?.title = audioRecorder.isRecording ? "Stop Recording" : "Record"
     }
 
     @MainActor func toggleRecordingFromHotkey() {
         print("Hotkey: toggle recording")
         toggleRecord(
             NSMenuItem(
-                title: isRecording ? "Stop Recording" : "Record",
+                title: audioRecorder.isRecording ? "Stop Recording" : "Record",
                 action: #selector(toggleRecord),
                 keyEquivalent: "r")
         )
     }
+    
+    // MARK: - AudioRecorderDelegate
+    
+    func audioRecorderDidStartRecording() {
+        Task { @MainActor in
+            updateIcon()
+            updateMenuTitle()
+            showSpectrumWindow()
+        }
+    }
+    
+    func audioRecorderDidStopRecording() {
+        Task { @MainActor in
+            updateIcon()
+            updateMenuTitle()
+            hideSpectrumWindow()
+        }
+    }
+    
+    func audioRecorderDidFinishTranscription(_ text: String, audioURL: URL) {
+        print("Transcription finished: \(text)")
+        // TODO: Handle the transcribed text and audio URL, e.g., save to a file, display in UI
+    }
+    
+    func audioRecorderDidFailWithError(_ error: Error) {
+        NSLog("Recording error: \(error)")
+    }
+
     @MainActor @objc func quitApp() {
         NSApp.terminate(nil)
     }
