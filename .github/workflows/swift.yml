@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build
-      run: swift build --product VoiceNotesApp -Xswiftc -diagnostic-style=llvm
+      run: swift build
     - name: Test
       run: swift test
 
