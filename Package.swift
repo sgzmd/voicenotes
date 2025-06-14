@@ -10,17 +10,20 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/argmaxinc/WhisperKit.git", from: "0.12.0"),
-        .package(path: "./Libraries/TranscriptionService"),
     ],
 
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
+        .target(name: "TranscriptionService",
+            dependencies: [
+                .product(name: "WhisperKit", package: "WhisperKit"),
+            ],
+            sources: ["TranscriptionService.swift"],
+        ),
         .executableTarget(
             name: "VoiceNotesApp",
             dependencies: [
+                "TranscriptionService",
                 .product(name: "WhisperKit", package: "WhisperKit"),
-                .product(name: "TranscriptionService", package: "TranscriptionService"),
             ]
         ),
     ]
