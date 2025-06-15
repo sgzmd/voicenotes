@@ -119,11 +119,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, AudioRecorderDelegate {
         // Temporary implementation for testing
         let progressWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 300, height: 150),
-            styleMask: [.titled, .closable],
+            styleMask: [.titled], // Removed .closable to hide the close button
             backing: .buffered,
             defer: false
         )
         progressWindow.title = "Progress"
+        progressWindow.isReleasedWhenClosed = false // Prevent deallocation on close
         progressWindow.contentView = NSHostingView(rootView: CustomProgressView(progress: $progressViewModel.progress, text: progressViewModel.text))
         progressWindow.makeKeyAndOrderFront(nil)
 
@@ -135,7 +136,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, AudioRecorderDelegate {
         DispatchQueue.global().async {
             for i in 0...100 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.05) {
-                    self.progressViewModel.updateProgress(to: Double(i), with: "Progress: \(i)%")
+                    Task { @MainActor in
+                        self.progressViewModel.updateProgress(to: Double(i), with: "Progress: \(i)%")
+                    }
                 }
             }
         }
