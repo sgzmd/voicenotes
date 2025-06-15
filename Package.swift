@@ -20,10 +20,15 @@ let package = Package(
             ],
             path: "Sources/TranscriptionService"
         ),
+        .target(name: "ProgressView",
+            dependencies: [],
+            path: "Sources/ProgressView"
+        ),
         .executableTarget(
             name: "VoiceNotesApp",
             dependencies: [
                 "TranscriptionService",
+                "ProgressView",
                 .product(name: "WhisperKit", package: "WhisperKit"),
             ],
             linkerSettings: [

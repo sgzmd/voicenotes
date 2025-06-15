@@ -1,11 +1,14 @@
 import AVFoundation
 import Cocoa
 import WhisperKit
+import SwiftUI
+import ProgressView
 
 class AppDelegate: NSObject, NSApplicationDelegate, AudioRecorderDelegate {
     var statusItem: NSStatusItem!
     var audioRecorder = AudioRecorder()
     var globalHotkeyListener: GlobalHotkeyListener? // Added
+     @StateObject private var progressViewModel = ProgressViewModel()
 
     var promptWindowController: PromptWindowController?
 
@@ -31,6 +34,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, AudioRecorderDelegate {
         menu.addItem(
             NSMenuItem(title: "Record", action: #selector(toggleRecord), keyEquivalent: "r"))
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
+
+        // MARK: temp menu item for testing
+        menu.addItem(NSMenuItem(title: "Test Progress", action: #selector(showProgress), keyEquivalent: "t"))
+
         statusItem.menu = menu
 
         // Use GlobalHotkeyListener instead of startEventTap
@@ -106,5 +113,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, AudioRecorderDelegate {
 
     @MainActor @objc func quitApp() {
         NSApp.terminate(nil)
+    }
+
+    @MainActor @objc func showProgress(_ sender: Any?) {
+        // Temporary implementation for testing
+        let progressWindow = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 300, height: 150),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        progressWindow.title = "Progress"
+        progressWindow.contentView = NSHostingView(rootView: CustomProgressView(progress: $progressViewModel.progress, text: progressViewModel.text))
+        progressWindow.makeKeyAndOrderFront(nil)
+
+        // Simulate progress updates for demonstration
+        simulateProgressUpdates()
+    }
+
+    private func simulateProgressUpdates() {
+        DispatchQueue.global().async {
+            for i in 0...100 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.05) {
+                    self.progressViewModel.updateProgress(to: Double(i), with: "Progress: \(i)%")
+                }
+            }
+        }
     }
 }
